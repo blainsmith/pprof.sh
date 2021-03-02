@@ -5,11 +5,12 @@ set -u
 
 usage() {
     printf "Usage:\n"
-    printf "\t${0} -tpfh\n\n"
+    printf "\t${0} -tpfuh\n\n"
     printf "\t-t cpu, memory, mutex, or trace\n"
     printf "\t-p path to the package\n"
     printf "\t-f name of the function\n"
-    printf "\t-h hostname to consume from /debug/* urls\n\n"
+    printf "\t-u url to consume profile from\n"
+    printf "\t-h this usage message\n\n"
     printf "Example:\n"
     printf "\t./pprof.sh -t cpu -p ./path/to/specific/package -f BenchmarkWickedFast\n\n"
     printf "\t./pprof.sh -b ./path/to/main/binary -u http://localhost:8080/debug/pprof/profile?seconds=10\n\n"
@@ -21,7 +22,7 @@ if [ $# -eq 0 ]
         usage
 fi
 
-optstring=":t:p:f:b:h:"
+optstring=":t:p:f:b:u:h"
 
 type=""
 package=""
@@ -36,6 +37,7 @@ while getopts ${optstring} arg; do
     f) function=${OPTARG} ;;
     b) binary=${OPTARG} ;;
     u) url=${OPTARG} ;;
+    h) usage ;;
 
     ?)
       echo "Invalid option: -${OPTARG}."
@@ -48,8 +50,8 @@ shift $((OPTIND -1))
 
 if [ ! -z "${url}" ] && [ ! -z "${binary}" ]
     then
-        curl -Ss -o pprof.${host}.pb.gz ${url}
-        go tool pprof -http=:6060 ${binary} pprof.${host}.pb.gz
+        curl -Ss -o pprof.pb.gz ${url}
+        go tool pprof -http=:6060 ${binary} pprof.pb.gz
         exit 0
 fi
 
