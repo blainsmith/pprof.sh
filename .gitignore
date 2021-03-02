@@ -1,0 +1,4 @@
+*.out
+*.test
+*.pb.gz
+main
